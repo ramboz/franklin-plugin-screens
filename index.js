@@ -1,7 +1,7 @@
 import {
   loadCSS,
   toClassName,
-} from '../../lib-franklin.js';
+} from '/scripts/lib-franklin.js';
 
 const DEFAULT_OPTIONS = {
   itemDuration: 8000,
