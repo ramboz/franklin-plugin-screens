@@ -17,8 +17,7 @@ const videoVisibilityObserver = new IntersectionObserver((entries) => {
     video.pause();
     video.currentTime = 0;
     video.load();
-  }
-  else {
+  } else {
     const promise = video.play();
     // If browser prevents playback, try playing the muted version instead
     if (promise) {
@@ -28,7 +27,7 @@ const videoVisibilityObserver = new IntersectionObserver((entries) => {
       });
     }
   }
-}, { threshold: .8 });
+}, { threshold: 0.8 });
 
 // Delay instrumentation of the visibility observer after the blocks have been decorated
 // and the channel is ready
@@ -57,18 +56,19 @@ function getUrl(link) {
     const videoId = link.match(/(\w+)\/view/)[1];
     return `https://drive.google.com/uc?export=download&id=${videoId}`;
   }
+  return link;
 }
 
-export default async function decorate(block, plugins) {
+export default async function decorate(block) {
   // Direct link embed
-  if (block.childElementCount == 1 && block.firstElementChild.childElementCount === 1) {
+  if (block.childElementCount === 1 && block.firstElementChild.childElementCount === 1) {
     const url = getUrl(block.firstElementChild.firstElementChild.textContent);
     block.innerHTML = `<video src="${url}" muted><video>`;
   } else { // Map config
     const video = document.createElement('video');
-    if (plugins.screens) { // Apply screens sequence item config
-      plugins.screens.decorateSequenceItem(block, video, {
-        src: getUrl
+    if (this.plugins.screens) { // Apply screens sequence item config
+      this.plugins.screens.decorateSequenceItem(block, video, {
+        src: getUrl,
       });
     }
   }

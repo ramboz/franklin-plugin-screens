@@ -10,13 +10,14 @@
  * governing permissions and limitations under the License.
  */
 
-export default async function decorate(block, plugins) {
+export default async function decorate(block) {
   // Direct link embed
-  if (block.childElementCount == 1 && block.firstElementChild.childElementCount === 1) {
+  if (block.childElementCount === 1 && block.firstElementChild.childElementCount === 1) {
     block.innerHTML = block.firstElementChild.firstElementChild.innerHTML;
   } else { // Map config
-    if (plugins.screens) { // Apply screens sequence item config
-      plugins.screens.decorateSequenceItem(block);
+    // eslint-disable-next-line no-lonely-if
+    if (this.plugins.screens) { // Apply screens sequence item config
+      this.plugins.screens.decorateSequenceItem(block);
     }
   }
 }

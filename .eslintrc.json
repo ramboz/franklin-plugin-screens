@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": "airbnb-base",
+  "env": {
+    "browser": true,
+    "mocha": true
+  },
+  "ignorePatterns": ["*.min.js"],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-param-reassign": [2, { "props": false }],
+    "import/extensions": ["error", { "js": "always" }]
+  }
+}
