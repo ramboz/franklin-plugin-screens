@@ -58,8 +58,66 @@ describe('Screens Plugin', () => {
   });
 
   describe('message', () => {
-    it('does nothing when a "channel-status-ready" is received if there are no embedded channels');
-    it('sends a "channel-show" message for every embedded channel when a "channel-status-ready" is received');
+    let iframe;
+
+    beforeEach(() => {
+      iframe = document.createElement('iframe');
+      iframe.src = 'about:blank';
+      document.body.append(iframe);
+    });
+
+    afterEach(() => {
+      iframe.remove();
+    });
+
+    it('does nothing when a "channel-status-ready" is received if there are no embedded channels', () => {
+      sinon.spy(iframe.contentWindow, 'postMessage');
+      const evt = new MessageEvent('message', {
+        data: JSON.stringify({ namespace: 'screens-player', type: 'channel-status-ready' }),
+        source: iframe.contentWindow,
+      });
+      window.dispatchEvent(evt);
+      assert(!iframe.contentWindow.postMessage.called);
+    });
+
+    it('sends a "channel-show" message to the embedded channel that sent us the "channel-status-ready"', () => {
+      const embed = document.createElement('div');
+      embed.classList.add('embed');
+      embed.append(iframe);
+      document.body.append(embed);
+      sinon.spy(iframe.contentWindow, 'postMessage');
+      const evt = new MessageEvent('message', {
+        data: JSON.stringify({ namespace: 'screens-player', type: 'channel-status-ready' }),
+        source: iframe.contentWindow,
+      });
+      window.dispatchEvent(evt);
+      assert(iframe.contentWindow.postMessage.calledWith(JSON.stringify({
+        namespace: 'screens-player',
+        type: 'channel-show',
+        data: {},
+      }), '*'));
+    });
+
+    it('sends a "channel-show" message to the embedded channel that sent us the "channel-status-ready" with multizone layout context if required', () => {
+      const main = document.createElement('main');
+      main.classList.add('cq-Screens-channel--multizone');
+      document.body.append(main);
+      const embed = document.createElement('div');
+      embed.classList.add('embed');
+      embed.append(iframe);
+      main.append(embed);
+      sinon.spy(iframe.contentWindow, 'postMessage');
+      const evt = new MessageEvent('message', {
+        data: JSON.stringify({ namespace: 'screens-player', type: 'channel-status-ready' }),
+        source: iframe.contentWindow,
+      });
+      window.dispatchEvent(evt);
+      assert(iframe.contentWindow.postMessage.calledWith(JSON.stringify({
+        namespace: 'screens-player',
+        type: 'channel-show',
+        data: { context: 'multizone' },
+      }), '*'));
+    });
   });
 
   describe('Plugin API', () => {
